@@ -1,3 +1,4 @@
+import axios, { AxiosError } from 'axios';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/axiosInstance';
@@ -29,18 +30,23 @@ const SignUpPage: React.FC = () => {
     const requestData: SignUpRequest = { email, password, username };
 
     try {
-      const response = await api.post('/api/v1/auth/signup', requestData);
-      alert(response.data.message);
-      navigate('/login');
-    } catch (error: any) {
-      if (error.response && error.response.data && error.response.data.data) {
-        alert(error.response.data.data.message);
-      } else {
-        alert('회원가입 중 알 수 없는 오류가 발생했습니다.');
-        console.error("Signup Error:", error);
-      }
+        const response = await api.post('/api/v1/auth/signup', requestData);
+        alert(response.data.message);
+        navigate('/login');
+    } catch (error) { // ✅ error: any를 지웁니다.
+        if (axios.isAxiosError(error)) {
+            if (error.response && error.response.data) {
+                const errorMessage = error.response.data.data?.message || '회원가입 중 오류가 발생했습니다.';
+                alert(errorMessage);
+            } else {
+                alert('서버와 통신할 수 없습니다.');
+            }
+        } else {
+            alert('알 수 없는 오류가 발생했습니다.');
+            console.error("An unexpected signup error occurred:", error);
+        }
     }
-  };
+};
   
   return (
     <div className={styles.authContainer}>

@@ -1,40 +1,45 @@
+import axios, { AxiosError } from 'axios';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'
 import api from '../api/axiosInstance';
 import styles from './AuthForm.module.css';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage: React.FC = () => {
+  const { login } = useAuth();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const navigate = useNavigate();
+  
 
+  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  // e.preventDefault();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  const requestData = { email, password };
+    e.preventDefault();
+    const requestData = { email, password }
 
-  try {
-    // api 인스턴스를 사용해 로그인 요청
-    const response = await api.post('/api/v1/auth/login', requestData);
-
-    // 응답 데이터 구조에 맞춰 accessToken과 refreshToken을 추출
-    const { accessToken, refreshToken } = response.data.data;
-
-    // 토큰들을 localStorage에 저장
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
-
-    alert('로그인 성공!');
-    navigate('/main');
-
-  } catch (error: any) {
-    // Axios 에러인 경우, 서버가 보낸 에러 메시지를 표시
-    if (error.response && error.response.data) {
-        alert(error.response.data.data.message || '로그인에 실패했습니다.');
-    } else {
-        alert('로그인 중 알 수 없는 오류가 발생했습니다.');
+    try {
+        const response = await api.post('/api/v1/auth/login', requestData);
+        const { accessToken, refreshToken } = response.data.data;
+        login(accessToken, refreshToken); // Context의 login 함수 호출
+    } catch (error) { // ✅ error: any를 지웁니다.
+      // Axios 에러인지 확인합니다.
+      if (axios.isAxiosError(error)) {
+          // 서버로부터 응답이 있고, 응답 데이터가 있는 경우
+          if (error.response && error.response.data) {
+              const errorMessage = error.response.data.data?.message || '로그인에 실패했습니다. 아이디 또는 비밀번호를 확인해주세요.';
+              alert(errorMessage);
+          } else {
+              // 서버 응답이 없는 네트워크 오류 등
+              alert('서버와 통신할 수 없습니다.');
+          }
+      } else {
+          // Axios 에러가 아닌 다른 종류의 에러 (예: 코드 실행 오류)
+          alert('알 수 없는 오류가 발생했습니다.');
+          console.error("An unexpected error occurred:", error);
+      }
     }
-  }
-};
+   };
 
   return (
     <div className={styles.authContainer}>
