@@ -1,53 +1,25 @@
 .feedContainer {
     width: 100%;
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 40px 20px;
     color: #e2e8f0;
 }
 
-.postList {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-}
-
-.postCard {
-    background-color: rgba(30, 41, 59, 0.5);
-    border: 1px solid #334155;
-    border-radius: 12px;
-    padding: 25px 30px;
-}
-
-.postContent {
-    font-size: 1.1rem;
-    line-height: 1.7;
-    margin: 0 0 25px 0;
-    white-space: pre-wrap; /* 줄바꿈 및 공백이 그대로 보이도록 설정 */
-}
-
-.postFooter {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.9rem;
-    color: #94a3b8;
-}
-
-.authorInfo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.profileImage {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    background-color: #475569;
-}
-
-.postAuthor {
+.feedHeader h2 {
+    font-size: 2rem;
     font-weight: 500;
+    margin: 0;
+}
+
+.feedHeader p {
+    font-size: 1rem;
+    color: #94a3b8;
+    margin-top: 8px;
+}
+
+/* ✨ 게시물 목록을 CSS Grid로 변경 */
+.postList {
+    display: grid;
+    /* 카드의 최소 너비는 300px, 공간이 남으면 균등하게 채움 */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px; /* 카드 사이의 간격 */
+    margin-top: 40px;
 }

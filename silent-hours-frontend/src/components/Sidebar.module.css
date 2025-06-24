@@ -1,0 +1,28 @@
+.sidebarContainer {
+  width: 280px;
+  height: 100%;
+  /* ✨ 수정된 부분: 배경색을 투명하게 만들고, min-height를 제거합니다. */
+  background-color: transparent; 
+  border-right: 1px solid rgba(51, 65, 85, 0.5); /* 반투명 보더 */
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  color: #e2e8f0;
+}
+
+/* ... 나머지 스타일은 이전과 동일하게 유지 ... */
+.logoContainer { display: flex; align-items: center; gap: 12px; padding: 0 10px; }
+.logoContainer h1 { font-size: 1.4rem; font-weight: 600; color: #f8fafc; }
+.searchBar { position: relative; }
+.searchIcon { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); color: #94a3b8; }
+.searchBar input { width: 100%; background-color: #1e293b; border: 1px solid #475569; border-radius: 8px; padding: 12px 15px 12px 40px; color: #f8f9fa; font-size: 0.95rem; outline: none; transition: border-color 0.3s; }
+.searchBar input:focus { border-color: #7dd3fc; }
+.navMenu ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.navLink, .activeLink { display: flex; align-items: center; gap: 15px; padding: 12px 15px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: background-color 0.2s, color 0.2s; }
+.navLink { color: #94a3b8; }
+.navLink:hover { background-color: #1e293b; color: #e2e8f0; }
+.activeLink { background-color: #1e293b; color: #f0f9ff; }
+.createButtonContainer { padding: 10px 0; }
+.createButton { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; font-size: 1rem; font-weight: 500; background-color: #0ea5e9; color: white; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; }
+.createButton:hover { background-color: #38bdf8; }

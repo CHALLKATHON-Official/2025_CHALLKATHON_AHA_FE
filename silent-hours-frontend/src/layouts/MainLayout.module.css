@@ -1,0 +1,19 @@
+.mainLayoutWrapper {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  
+  background-color: rgba(2, 6, 23, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.contentArea {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+}
