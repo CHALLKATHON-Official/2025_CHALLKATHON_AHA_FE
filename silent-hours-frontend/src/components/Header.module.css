@@ -1,5 +1,8 @@
+/* Header.module.css */
+
 .header {
-    position: fixed; top: 0; left: 0; width: 100%; height: 70px;
+    position: fixed; top: 0; left: 0; width: 100%;
+    height: 60px; /* ✨ 높이를 70px에서 60px으로 줄입니다. */
     background-color: rgba(15, 23, 42, 0.8);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid #334155;
@@ -10,12 +13,15 @@
     display: flex; justify-content: space-between; align-items: center;
 }
 .logo {
-    font-size: 1.5rem; font-weight: 500; color: #e2e8f0; text-decoration: none;
+    font-size: 1.3rem; /* ✨ 로고 폰트 크기 축소 */
+    font-weight: 500; color: #e2e8f0; text-decoration: none;
 }
 .navButton, .navButtonSecondary {
     background-color: transparent; color: #e2e8f0; border: 1px solid #475569;
-    padding: 8px 16px; border-radius: 8px; cursor: pointer;
-    font-size: 1rem; text-decoration: none; transition: background-color 0.2s, color 0.2s;
+    padding: 6px 14px; /* ✨ 버튼 패딩 축소 */
+    border-radius: 8px; cursor: pointer;
+    font-size: 0.9rem; /* ✨ 버튼 폰트 크기 축소 */
+    text-decoration: none; transition: background-color 0.2s, color 0.2s;
     margin-left: 10px; display: inline-block;
 }
 .navButton:hover { background-color: #475569; }

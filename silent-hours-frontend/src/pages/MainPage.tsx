@@ -1,67 +1,87 @@
 import React, { useState, useEffect } from 'react';
 import styles from './MainPage.module.css';
+import api from '../api/axiosInstance';
+import PostCard from '../components/PostCard';
+import { useAuth } from '../context/AuthContext';
+import type { PostData } from '../types';
 
-// 포스트 데이터의 타입을 정의합니다.
-interface Post {
-    id: number;
-    username: string;
-    content: string;
-    createdAt: string;
-    profileImageUrl: string;
-}
 
-// API 연동 전 사용할 임시 가짜 데이터 (Mock Data)
-const mockPosts: Post[] = [
-    { 
-        id: 1, 
-        username: '별 헤는 밤', 
-        content: '오늘 밤에도 별이 바람에 스치운다.\n고요한 시간 속에 나를 남겨본다.', 
-        createdAt: '2025-06-23T22:10:00', 
-        profileImageUrl: 'https://i.pravatar.cc/150?u=1' 
-    },
-    { 
-        id: 2, 
-        username: '우주 여행자', 
-        content: '고요한 우주 속에서 나의 작은 목소리를 기록해본다. 누군가 들어주지 않아도 괜찮아. 이 자체로 의미가 있으니까.', 
-        createdAt: '2025-06-23T18:45:00', 
-        profileImageUrl: 'https://i.pravatar.cc/150?u=2' 
-    },
-    { 
-        id: 3, 
-        username: '은하수', 
-        content: '다들 오늘 하루는 어떠셨나요? 저는 오늘 조금 힘들었네요. 그래도 여기에 털어놓으니 한결 나아집니다.', 
-        createdAt: '2025-06-23T15:10:00', 
-        profileImageUrl: 'https://i.pravatar.cc/150?u=3' 
-    },
-];
+const MainPage: React.FC = () => {
+    const [posts, setPosts] = useState<PostData[]>([]);
+    const [page, setPage] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const { isLoggedIn } = useAuth(); // 로그인 상태 확인
 
-const FeedPage: React.FC = () => {
-    const [posts, setPosts] = useState<Post[]>([]);
+    const fetchPosts = async (isRefresh = false) => {
+        if (loading && !isRefresh) return;
+        setLoading(true);
+        try {
+            const nextPage = isRefresh ? 0 : page;
+            const response = await api.get('/api/v1/posts', {
+                params: { page: nextPage, size: 10, sort: 'createdAt,desc' }
+            });
+            const newPosts: PostData[] = (response.data?.data?.content || []).map((post: any) => ({
+                ...post,
+                isEchoed: post.isEchoed || false 
+            }));
+
+            if (isRefresh) {
+                setPosts(newPosts);
+            } else {
+                setPosts(prev => [...prev, ...newPosts]);
+            }
+            if (newPosts.length > 0) {
+              setPage(nextPage + 1);
+            }
+        } catch (error) {
+            console.error("피드 데이터를 불러오는 데 실패했습니다:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        // 페이지가 로드될 때, 실제 API를 호출하는 대신 가짜 데이터를 사용합니다.
-        console.log("피드 데이터를 불러옵니다. (현재는 가짜 데이터)");
-        setPosts(mockPosts);
-    }, []); // 이 useEffect는 한 번만 실행됩니다.
+        const handleRefresh = () => fetchPosts(true);
+        window.addEventListener('post-created', handleRefresh);
+        fetchPosts(true); // 초기 로딩
+        return () => window.removeEventListener('post-created', handleRefresh);
+    }, []);
+
+    const handleToggleEcho = async (postId: number) => {
+        if (!isLoggedIn) {
+            alert("로그인이 필요한 기능입니다.");
+            return;
+        }
+        try {
+            const response = await api.post(`/api/v1/posts/${postId}/echo`);
+            const { echoCount, isEchoed } = response.data.data;
+            setPosts(posts.map(p =>
+                p.postId === postId ? { ...p, echoCount, isEchoed } : p
+            ));
+        } catch (error) {
+            console.error("Echo 처리 중 오류 발생:", error);
+        }
+    };
 
     return (
+        // ✨ 새로운 feedContainer 클래스 적용
         <div className={styles.feedContainer}>
+            <header className={styles.feedHeader}>
+                <h2>Anonymous messages</h2>
+                <p>For emotional messages</p>
+            </header>
+            
+            {/* ✨ postList 클래스를 그리드 레이아웃으로 변경 */}
             <main className={styles.postList}>
                 {posts.map((post) => (
-                    <article key={post.id} className={styles.postCard}>
-                        <p className={styles.postContent}>{post.content}</p>
-                        <footer className={styles.postFooter}>
-                            <div className={styles.authorInfo}>
-                                <img src={post.profileImageUrl} alt={post.username} className={styles.profileImage} />
-                                <span className={styles.postAuthor}>{post.username}</span>
-                            </div>
-                            <span className={styles.postTimestamp}>{new Date(post.createdAt).toLocaleString()}</span>
-                        </footer>
-                    </article>
+                    <PostCard key={post.postId} post={post} onToggleEcho={handleToggleEcho} />
                 ))}
             </main>
+
+            {loading && <p>Loading more...</p>}
+            {!loading && posts.length === 0 && <p>표시할 게시물이 없습니다.</p>}
         </div>
     );
 };
 
-export default FeedPage;
+export default MainPage;
