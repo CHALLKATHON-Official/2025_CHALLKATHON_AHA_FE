@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import MainLayout from "./layouts/MainLayout";
@@ -35,6 +35,12 @@ const AppContent: React.FC = () => {
   const location = useLocation();
   const isAuthPage =
     location.pathname === "/login" || location.pathname === "/signup";
+
+  useEffect(() => {
+    if (isSidebarOpen) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname]);
 
   const appContainerStyle: React.CSSProperties = {
     minHeight: "100vh",

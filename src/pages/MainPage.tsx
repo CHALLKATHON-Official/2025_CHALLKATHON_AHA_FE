@@ -1,87 +1,121 @@
-import React, { useState, useEffect } from 'react';
-import styles from './MainPage.module.css';
-import api from '../api/axiosInstance';
-import PostCard from '../components/PostCard';
-import { useAuth } from '../context/AuthContext';
-import type { PostData } from '../types';
-
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import styles from "./MainPage.module.css";
+import api from "../api/axiosInstance";
+import PostCard from "../components/PostCard";
+import { useAuth } from "../context/AuthContext";
+import type { PostData } from "../types";
 
 const MainPage: React.FC = () => {
-    const [posts, setPosts] = useState<PostData[]>([]);
-    const [page, setPage] = useState(0);
-    const [loading, setLoading] = useState(false);
-    const { isLoggedIn } = useAuth(); // 로그인 상태 확인
+  const [posts, setPosts] = useState<PostData[]>([]);
+  const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const { isLoggedIn } = useAuth();
 
-    const fetchPosts = async (isRefresh = false) => {
-        if (loading && !isRefresh) return;
-        setLoading(true);
-        try {
-            const nextPage = isRefresh ? 0 : page;
-            const response = await api.get('/api/v1/posts', {
-                params: { page: nextPage, size: 10, sort: 'createdAt,desc' }
-            });
-            const newPosts: PostData[] = (response.data?.data?.content || []).map((post: any) => ({
-                ...post,
-                isEchoed: post.isEchoed || false 
-            }));
+  // IntersectionObserver 로직
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastPostElementRef = useCallback(
+    (node: HTMLElement | null) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
 
-            if (isRefresh) {
-                setPosts(newPosts);
-            } else {
-                setPosts(prev => [...prev, ...newPosts]);
-            }
-            if (newPosts.length > 0) {
-              setPage(nextPage + 1);
-            }
-        } catch (error) {
-            console.error("피드 데이터를 불러오는 데 실패했습니다:", error);
-        } finally {
-            setLoading(false);
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prevPage) => prevPage + 1);
         }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
+
+  // 데이터 로딩을 위한 useEffect
+  useEffect(() => {
+    // 로딩 중이거나 더 이상 데이터가 없으면 중단
+    if (loading || !hasMore) return;
+
+    const fetchPosts = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get("/api/v1/posts", {
+          params: { page, size: 10, sort: "createdAt,desc" },
+        });
+        const data = response.data?.data;
+        const newPosts = data?.content || [];
+
+        setPosts((prev) => [...prev, ...newPosts]);
+        setHasMore(!data.last);
+      } catch (error) {
+        console.error("피드 데이터를 불러오는 데 실패했습니다:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    useEffect(() => {
-        const handleRefresh = () => fetchPosts(true);
-        window.addEventListener('post-created', handleRefresh);
-        fetchPosts(true); // 초기 로딩
-        return () => window.removeEventListener('post-created', handleRefresh);
-    }, []);
+    fetchPosts();
+  }, [page]); // 'page'가 변경될 때만 이 effect 실행
 
-    const handleToggleEcho = async (postId: number) => {
-        if (!isLoggedIn) {
-            alert("로그인이 필요한 기능입니다.");
-            return;
-        }
-        try {
-            const response = await api.post(`/api/v1/posts/${postId}/echo`);
-            const { echoCount, isEchoed } = response.data.data;
-            setPosts(posts.map(p =>
-                p.postId === postId ? { ...p, echoCount, isEchoed } : p
-            ));
-        } catch (error) {
-            console.error("Echo 처리 중 오류 발생:", error);
-        }
+  // 새로고침 및 초기 로딩을 위한 useEffect
+  useEffect(() => {
+    const handleRefresh = () => {
+      setPosts([]);
+      setHasMore(true);
+      setPage(0);
     };
 
-    return (
-        // ✨ 새로운 feedContainer 클래스 적용
-        <div className={styles.feedContainer}>
-            <header className={styles.feedHeader}>
-                <h2>Anonymous messages</h2>
-                <p>For emotional messages</p>
-            </header>
-            
-            {/* ✨ postList 클래스를 그리드 레이아웃으로 변경 */}
-            <main className={styles.postList}>
-                {posts.map((post) => (
-                    <PostCard key={post.postId} post={post} onToggleEcho={handleToggleEcho} />
-                ))}
-            </main>
+    handleRefresh(); // 초기 로딩 시 실행
 
-            {loading && <p>Loading more...</p>}
-            {!loading && posts.length === 0 && <p>표시할 게시물이 없습니다.</p>}
-        </div>
-    );
+    window.addEventListener("post-created", handleRefresh);
+    return () => window.removeEventListener("post-created", handleRefresh);
+  }, []); // 컴포넌트 마운트 시 한 번만 실행
+
+  const handleToggleEcho = async (postId: number) => {
+    if (!isLoggedIn) return alert("로그인이 필요한 기능입니다.");
+    try {
+      const response = await api.post(`/api/v1/posts/${postId}/echo`);
+      const { echoCount, isEchoed } = response.data.data;
+      setPosts(
+        posts.map((p) =>
+          p.postId === postId ? { ...p, echoCount, isEchoed } : p
+        )
+      );
+    } catch (error) {
+      console.error("Echo 처리 중 오류 발생:", error);
+    }
+  };
+
+  return (
+    <div className={styles.feedContainer}>
+      <header className={styles.feedHeader}>
+        <h2>Anonymous messages</h2>
+        <p>For emotional messages</p>
+      </header>
+
+      <main className={styles.postList}>
+        {posts.map((post, index) => {
+          if (posts.length === index + 1) {
+            return (
+              <div ref={lastPostElementRef} key={post.postId}>
+                <PostCard post={post} onToggleEcho={handleToggleEcho} />
+              </div>
+            );
+          }
+          return (
+            <PostCard
+              key={post.postId}
+              post={post}
+              onToggleEcho={handleToggleEcho}
+            />
+          );
+        })}
+      </main>
+
+      {loading && <p>Loading more...</p>}
+      {!loading && !hasMore && posts.length > 0 && <p>마지막 게시물입니다.</p>}
+      {!loading && posts.length === 0 && <p>표시할 게시물이 없습니다.</p>}
+    </div>
+  );
 };
 
 export default MainPage;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import api from "../api/axiosInstance";
 import styles from "./TimelinePage.module.css";
 import type { TimelineEntry } from "../types";
@@ -16,53 +16,58 @@ const TimelinePage: React.FC = () => {
     Object.keys(TIME_SLOTS)[0]
   );
   const [entries, setEntries] = useState<TimelineEntry[]>([]);
-  const [page, setPage] = useState(0); // 페이지 상태는 유지 (추후 무한 스크롤 대비)
+  const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
-  // ✨ 데이터 로딩 로직을 useEffect 안으로 통합하여 안정화
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastEntryElementRef = useCallback(
+    (node: HTMLElement | null) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prevPage) => prevPage + 1);
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
+
+  // 데이터 로딩 useEffect
   useEffect(() => {
+    if (loading || !hasMore) return;
+
     const fetchTimeline = async () => {
       setLoading(true);
-      // 탭을 누를 때마다 항상 첫 페이지부터 새로 로드
       try {
         const timeSlotParam =
           TIME_SLOTS[selectedSlotKey as keyof typeof TIME_SLOTS][0];
-
         const response = await api.get("/api/v1/timeline", {
-          params: {
-            timeSlot: timeSlotParam,
-            page: 0, // 항상 첫 페이지(0)부터 조회
-            size: 15,
-          },
+          params: { timeSlot: timeSlotParam, page, size: 15 },
         });
-
         const data = response.data.data;
-        setEntries(data.content); // 기존 데이터를 덮어쓰기
+        setEntries((prev) =>
+          page === 0 ? data.content : [...prev, ...data.content]
+        );
         setHasMore(!data.last);
-        setPage(1); // 다음 페이지는 1페이지로 설정
       } catch (error) {
         console.error("타임라인 데이터를 불러오는 데 실패했습니다:", error);
-        setEntries([]); // 에러 발생 시 목록 비우기
       } finally {
         setLoading(false);
       }
     };
-
     fetchTimeline();
-    // ✨ 의존성 배열을 selectedSlotKey만 두어 탭 선택 시에만 실행되도록 변경
+  }, [page, selectedSlotKey]);
+
+  // 탭 변경 시 상태 리셋 useEffect
+  useEffect(() => {
+    setEntries([]);
+    setHasMore(true);
+    setPage(0);
   }, [selectedSlotKey]);
-
-  const handleSelectSlot = (slotKey: string) => {
-    setSelectedSlotKey(slotKey);
-  };
-
-  // 무한 스크롤 로직 (참고용, 현재는 사용되지 않음)
-  // const loadMore = () => {
-  //   if (!loading && hasMore) {
-  //     // fetchTimeline(selectedSlotKey, page) 호출
-  //   }
-  // };
 
   return (
     <div className={styles.timelineContainer}>
@@ -78,7 +83,7 @@ const TimelinePage: React.FC = () => {
             className={`${styles.tab} ${
               selectedSlotKey === key ? styles.active : ""
             }`}
-            onClick={() => handleSelectSlot(key)}
+            onClick={() => setSelectedSlotKey(key)}
           >
             {key}
           </button>
@@ -86,9 +91,16 @@ const TimelinePage: React.FC = () => {
       </div>
 
       <main className={styles.entryList}>
-        {entries.map((entry) => (
-          <TimelineCard key={entry.entryId} entry={entry} />
-        ))}
+        {entries.map((entry, index) => {
+          if (entries.length === index + 1) {
+            return (
+              <div ref={lastEntryElementRef} key={entry.entryId}>
+                <TimelineCard entry={entry} />
+              </div>
+            );
+          }
+          return <TimelineCard key={entry.entryId} entry={entry} />;
+        })}
       </main>
 
       {loading && <p className={styles.loading}>기록을 불러오는 중...</p>}

@@ -65,3 +65,31 @@
   padding: 40px 0;
   color: #94a3b8;
 }
+
+@media (max-width: 768px) {
+  .header {
+    margin-bottom: 30px;
+  }
+
+  .header h1 {
+    font-size: 1.8rem; /* 모바일용 제목 크기 */
+  }
+
+  .header p {
+    font-size: 1rem; /* 모바일용 부제목 크기 */
+  }
+
+  .tabs {
+    gap: 8px; /* 탭 간격 축소 */
+    margin-bottom: 30px;
+  }
+
+  .tab {
+    padding: 8px 12px; /* 탭 내부 여백 축소 */
+    font-size: 0.9rem; /* 탭 글자 크기 축소 */
+  }
+
+  .entryList {
+    gap: 15px; /* 카드 간격 축소 */
+  }
+}

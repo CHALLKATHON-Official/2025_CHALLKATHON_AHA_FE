@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import styles from "./MyChroniclePage.module.css"; // ✨ 새로운 CSS 모듈 사용
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import styles from "./MyChroniclePage.module.css";
 import api from "../api/axiosInstance";
 import PostCard from "../components/PostCard";
 import { useAuth } from "../context/AuthContext";
@@ -12,37 +12,54 @@ const MyChroniclePage: React.FC = () => {
   const [hasMore, setHasMore] = useState(true);
   const { isLoggedIn } = useAuth();
 
-  const fetchMyPosts = async (pageNum: number) => {
-    if (loading || !hasMore) return;
-    setLoading(true);
-    try {
-      const response = await api.get("/api/v1/mypage/posts", {
-        params: { page: pageNum, size: 10 },
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastPostElementRef = useCallback(
+    (node: HTMLElement | null) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prevPage) => prevPage + 1);
+        }
       });
-      const newPosts: PostData[] = response.data?.data?.content || [];
-
-      setPosts((prev) => (pageNum === 0 ? newPosts : [...prev, ...newPosts]));
-      setHasMore(!response.data.data.last);
-    } catch (error) {
-      console.error("내 기록을 불러오는 데 실패했습니다:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
 
   useEffect(() => {
-    if (isLoggedIn) {
-      fetchMyPosts(0);
-    }
+    if (!isLoggedIn) return;
+    if (loading || !hasMore) return;
+
+    const fetchMyPosts = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get("/api/v1/mypage/posts", {
+          params: { page, size: 10 },
+        });
+        const data = response.data?.data;
+        setPosts((prev) =>
+          page === 0 ? data.content : [...prev, ...data.content]
+        );
+        setHasMore(!data.last);
+      } catch (error) {
+        console.error("내 기록을 불러오는 데 실패했습니다:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMyPosts();
+  }, [isLoggedIn, page]);
+
+  useEffect(() => {
+    setPosts([]);
+    setHasMore(true);
+    setPage(0);
   }, [isLoggedIn]);
 
   const handleToggleEcho = async (postId: number) => {
-    if (!isLoggedIn) {
-      alert("로그인이 필요한 기능입니다.");
-      return;
-    }
+    if (!isLoggedIn) return;
     try {
-      // '메아리' 기능은 메인 페이지와 동일하게 동작
       const response = await api.post(`/api/v1/posts/${postId}/echo`);
       const { echoCount, isEchoed } = response.data.data;
       setPosts(
@@ -63,20 +80,30 @@ const MyChroniclePage: React.FC = () => {
       </header>
 
       <main className={styles.postList}>
-        {posts.map((post) => (
-          <PostCard
-            key={post.postId}
-            post={post}
-            onToggleEcho={handleToggleEcho}
-          />
-        ))}
+        {posts.map((post, index) => {
+          if (posts.length === index + 1) {
+            return (
+              <div ref={lastPostElementRef} key={post.postId}>
+                <PostCard post={post} onToggleEcho={handleToggleEcho} />
+              </div>
+            );
+          }
+          return (
+            <PostCard
+              key={post.postId}
+              post={post}
+              onToggleEcho={handleToggleEcho}
+            />
+          );
+        })}
       </main>
 
       {loading && <p className={styles.message}>기록을 불러오는 중...</p>}
       {!loading && !hasMore && posts.length > 0 && (
         <p className={styles.message}>마지막 기록입니다.</p>
       )}
-      {!loading && posts.length === 0 && (
+      {!isLoggedIn && <p className={styles.message}>로그인 후 이용해주세요.</p>}
+      {isLoggedIn && posts.length === 0 && !loading && (
         <p className={styles.message}>아직 작성한 기록이 없습니다.</p>
       )}
     </div>
