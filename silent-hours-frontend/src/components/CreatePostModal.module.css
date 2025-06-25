@@ -118,3 +118,28 @@
 .submitButton:hover {
   background-color: #38bdf8;
 }
+
+.tagContainer {
+  margin-top: 16px;
+}
+
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tagButton {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
+
+.selected {
+  background-color: #6366f1;
+  color: white;
+  border-color: #6366f1;
+}
