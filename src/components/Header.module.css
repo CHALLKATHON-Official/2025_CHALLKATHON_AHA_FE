@@ -1,0 +1,80 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  background-color: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+.headerContent {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex; /* Flexbox 사용 */
+  align-items: center;
+}
+
+.headerLeft,
+.headerRight {
+  flex: 1; /* 남는 공간을 동일하게 차지 */
+}
+
+.headerLeft {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.headerCenter {
+  /* 중앙 로고는 flex-grow를 주지 않아 내용만큼만 차지 */
+}
+
+.headerRight {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.logo {
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #e2e8f0;
+  text-decoration: none;
+}
+
+.menuButton {
+  display: none; /* 데스크톱에서는 숨김 */
+  background: transparent;
+  border: none;
+  color: #e2e8f0;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.navButton {
+  background-color: #1d4ed8;
+  border: 1px solid #2563eb;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.navButton:hover {
+  background-color: #2563eb;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .menuButton {
+    display: block; /* 모바일에서 햄버거 메뉴 보이기 */
+  }
+}

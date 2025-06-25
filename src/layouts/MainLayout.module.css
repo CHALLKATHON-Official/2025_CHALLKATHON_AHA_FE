@@ -1,0 +1,66 @@
+.mainLayoutWrapper {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: rgba(2, 6, 23, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative; /* 자식 요소의 absolute 포지셔닝을 위해 추가 */
+}
+
+.sidebarWrapper {
+  /* 데스크톱 사이드바 기본 스타일 */
+}
+
+.contentArea {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.sidebarOverlay {
+  display: none; /* 데스크톱에서는 숨김 */
+}
+
+@media (max-width: 768px) {
+  .mainLayoutWrapper {
+    border-radius: 0;
+  }
+  .contentArea {
+    padding: 20px;
+  }
+
+  /* ✨ 모바일 사이드바 스타일 */
+  .sidebarWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transform: translateX(-100%); /* 기본적으로 화면 밖에 위치 */
+    transition: transform 0.3s ease-in-out;
+    z-index: 2000;
+    background-color: #0f172a; /* 배경색 지정 */
+    border-right: 1px solid rgba(51, 65, 85, 0.5);
+  }
+
+  .sidebarWrapper.open {
+    transform: translateX(0); /* 열렸을 때 화면 안으로 이동 */
+  }
+
+  /* ✨ 오버레이 스타일 */
+  .sidebarOverlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1999;
+  }
+}

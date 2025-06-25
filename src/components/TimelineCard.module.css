@@ -1,0 +1,51 @@
+.card {
+  background-color: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(5px);
+  border: 1px solid #334155;
+  border-radius: 12px; /* 모서리를 조금 더 각지게 */
+  padding: 20px 25px; /* 내부 여백 축소 */
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  height: 200px; /* ✨ 높이 축소 (250px -> 220px) */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px); /* 호버 시 살짝 떠오르는 효과 */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.content {
+  flex-grow: 1;
+  font-size: 1rem; /* ✨ 글자 크기 소폭 축소 */
+  line-height: 1.6; /* 줄 간격 소폭 축소 */
+  white-space: pre-wrap;
+  overflow-y: auto;
+  margin: 0;
+  /* 스크롤바 디자인 (선택 사항) */
+  scrollbar-width: thin;
+  scrollbar-color: #4b5563 #1e293b;
+}
+
+.content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+  border-radius: 6px;
+}
+
+.footer {
+  font-size: 0.85rem; /* ✨ 글자 크기 소폭 축소 */
+  color: #94a3b8;
+  border-top: 1px solid #334155;
+  padding-top: 12px; /* 내부 여백 축소 */
+  margin-top: 15px; /* 내부 여백 축소 */
+  text-align: right;
+}
