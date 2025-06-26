@@ -72,3 +72,85 @@
     margin-top: 10px;
   }
 }
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 15px; /* 본문과의 간격 */
+  padding-bottom: 15px; /* 푸터와의 간격 */
+  border-bottom: 1px solid #334155; /* 푸터와 구분선 */
+}
+
+.tag {
+  background-color: #334155;
+  color: #cbd5e1;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background-color 0.2s, box-shadow 0.2s, color 0.2s;
+  cursor: pointer;
+}
+
+.tag:hover {
+  background-color: #475569;
+}
+
+/* 👇 선택된 태그에 적용될 스타일을 추가합니다. */
+.tag.selected {
+  background-color: #0ea5e9;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+}
+
+.footer {
+  /* 👇 기존 footer 스타일에서 border-top과 margin-top을 제거하거나 수정합니다. */
+  font-size: 0.85rem;
+  color: #94a3b8;
+  padding-top: 12px;
+  margin-top: 0; /* 태그 컨테이너가 있으므로 margin 제거 */
+  text-align: right;
+  border-top: none; /* 구분선은 tagsContainer에서 처리 */
+}
+.tagsContainer {
+  /* 👇 피드 카드와 동일한 스타일 적용 */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.tag {
+  /* 👇 피드 카드와 동일한 스타일 적용 */
+  background-color: #334155;
+  color: #cbd5e1;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  cursor: pointer; /* 클릭 가능함을 나타내는 커서 모양 추가 */
+}
+
+.tag:hover {
+  background-color: #475569;
+}
+
+.footer {
+  /* 👇 flexbox를 사용하여 태그와 날짜를 양쪽으로 정렬 */
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  border-top: 1px solid #334155;
+  padding-top: 12px;
+  margin-top: auto; /* 카드의 남은 공간을 모두 차지하여 푸터를 맨 아래에 위치시킴 */
+}
+
+.timestamp {
+  flex-shrink: 0; /* 날짜가 줄어들지 않도록 설정 */
+  margin-left: 15px;
+}
