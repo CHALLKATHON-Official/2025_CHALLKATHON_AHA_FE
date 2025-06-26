@@ -1,0 +1,95 @@
+.timelineContainer {
+  width: 100%;
+  color: #e2e8f0;
+}
+
+.header {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin: 0 0 10px;
+  color: #f0f9ff;
+}
+
+.header p {
+  font-size: 1.1rem;
+  color: #94a3b8;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
+.tab {
+  background-color: rgba(30, 41, 59, 0.7);
+  border: 1px solid #334155;
+  color: #cbd5e1;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  background-color: #334155;
+  color: white;
+}
+
+.tab.active {
+  background-color: #1d4ed8;
+  border-color: #2563eb;
+  color: white;
+  font-weight: 500;
+}
+
+.entryList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 25px;
+}
+
+.loading,
+.endOfList {
+  text-align: center;
+  grid-column: 1 / -1; /* 전체 너비 차지 */
+  padding: 40px 0;
+  color: #94a3b8;
+}
+
+@media (max-width: 768px) {
+  .header {
+    margin-bottom: 30px;
+  }
+
+  .header h1 {
+    font-size: 1.8rem; /* 모바일용 제목 크기 */
+  }
+
+  .header p {
+    font-size: 1rem; /* 모바일용 부제목 크기 */
+  }
+
+  .tabs {
+    gap: 8px; /* 탭 간격 축소 */
+    margin-bottom: 30px;
+  }
+
+  .tab {
+    padding: 8px 12px; /* 탭 내부 여백 축소 */
+    font-size: 0.9rem; /* 탭 글자 크기 축소 */
+  }
+
+  .entryList {
+    gap: 15px; /* 카드 간격 축소 */
+  }
+}

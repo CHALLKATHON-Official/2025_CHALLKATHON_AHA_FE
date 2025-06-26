@@ -1,0 +1,88 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001;
+  backdrop-filter: blur(5px);
+}
+
+.modalContent {
+  background-color: #1e293b;
+  padding: 30px 40px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  border: 1px solid #334155;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  color: #e2e8f0;
+  text-align: center;
+}
+
+.modalContent h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-weight: 500;
+  font-size: 1.4rem;
+}
+
+.message {
+  color: #cbd5e1;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.closeButton {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #64748b;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.cancelButton,
+.confirmButton {
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 120px;
+}
+
+.cancelButton {
+  background-color: #374151; /* 어두운 회색 */
+  color: #e2e8f0;
+  border: 1px solid #4b5563;
+}
+
+.cancelButton:hover {
+  background-color: #4b5563;
+}
+
+.confirmButton {
+  background-color: #1d4ed8; /* 어두운 파란색 */
+  color: white;
+  border: 1px solid #2563eb;
+}
+
+.confirmButton:hover {
+  background-color: #2563eb;
+}

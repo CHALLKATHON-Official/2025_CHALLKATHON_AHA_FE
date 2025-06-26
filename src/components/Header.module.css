@@ -1,0 +1,84 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 42px; 
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  background-color: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+.headerContent {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* <<< 핵심 수정: 양쪽 끝으로 요소를 밀어냅니다. */
+}
+
+/* headerLeft와 headerRight의 flex: 1 속성은 제거합니다. */
+.headerLeft,
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* 내부 요소 간의 간격 */
+}
+
+/* 중앙 영역 스타일은 이제 필요 없으므로 삭제합니다. */
+/* .headerCenter { ... } */
+
+
+.logo {
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #e2e8f0;
+  text-decoration: none;
+}
+
+.menuButton {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #e2e8f0;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.navButton {
+  background-color: #1d4ed8;
+  border: 1px solid #2563eb;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.navButton:hover {
+  background-color: #2563eb;
+}
+
+.logoutButton {
+  background-color: transparent;
+  border: none;
+}
+
+.logoutButton:hover {
+  background-color: rgba(71, 85, 105, 0.3);
+  text-decoration: underline;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .menuButton {
+    display: block;
+  }
+}
