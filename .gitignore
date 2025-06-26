@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Logs
 logs
 *.log
@@ -22,3 +23,84 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+=======
+# Created by https://www.toptal.com/developers/gitignore/api/java,spring,gradle,maven,intellij,eclipse,visualstudiocode
+# Edit at https://www.toptal.com/developers/gitignore?templates=java,spring,gradle,maven,intellij,eclipse,visualstudiocode
+
+### Spring ###
+# Ignore sensitive configuration files
+# IMPORTANT: DO NOT commit files with production secrets.
+# Use a template file like 'application.yml.example' instead.
+application.properties
+application.yml
+
+# Compiled output
+/target/
+/build/
+/out/
+
+# Log files
+*.log
+logs/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+### Gradle ###
+.gradle
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+!gradlew
+!gradlew.bat
+
+### IntelliJ ###
+# Covers IntelliJ IDEA's private user files, such as preferences and run configurations.
+.idea/
+*.iml
+*.iws
+*.ipr
+modules.xml
+out/
+
+### Eclipse ###
+.project
+.classpath
+.settings/
+bin/
+
+### Maven ###
+/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+
+### VisualStudioCode ###
+.vscode/
+*.code-workspace
+
+### Operating System Files ###
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+
+# End of https://www.toptal.com/developers/gitignore/api/java,spring,gradle,maven,intellij,eclipse,visualstudiocode
+>>>>>>> d2a09e39bc53ef6546cb2b2b2d624acb99a4baaf
