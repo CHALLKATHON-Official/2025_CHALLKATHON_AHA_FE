@@ -25,6 +25,7 @@ export interface TimelineEntry {
   eraYear: number;
   eraMonth: number;
   originalCreatedAt: string;
+  tags: string[]; // 👈 이 줄을 추가합니다.
 }
 
 export interface UserProfile {

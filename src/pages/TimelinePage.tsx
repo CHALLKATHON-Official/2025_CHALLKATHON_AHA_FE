@@ -17,51 +17,62 @@ const TimelinePage: React.FC = () => {
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
-  // 1. 데이터 로딩 로직을 useCallback으로 분리하여 재사용 가능하고 안정적인 함수로 만듭니다.
-  const fetchTimeline = useCallback(async (pageNum: number, slotKey: string) => {
-    if (loading) return; // 중복 요청 방지
+  const loadingRef = useRef(loading);
+  loadingRef.current = loading;
+
+  const fetchTimeline = useCallback(async (pageNum: number, slotKey: string, tagName: string | null) => {
+    if (loadingRef.current) return;
     setLoading(true);
+
     try {
       const timeSlotsValues = TIME_SLOTS[slotKey as keyof typeof TIME_SLOTS];
       const params = new URLSearchParams();
       params.append('page', pageNum.toString());
       params.append('size', '15');
       timeSlotsValues.forEach(slot => params.append('timeSlots', slot));
+      
+      if (tagName) {
+        params.append('tagName', tagName);
+      }
 
       const response = await api.get("/api/v1/timeline", { params });
-      const data = response.data.data;
+      
+      const pageData = response.data.data;
+      const newEntries = pageData.content || []; 
 
-      // 페이지 번호가 0이면 새 데이터로 교체(탭 변경), 아니면 기존 데이터에 추가(무한 스크롤)
-      setEntries(prev => (pageNum === 0 ? data.content : [...prev, ...data.content]));
-      setHasMore(!data.last);
+      setEntries(prev => (pageNum === 0 ? newEntries : [...prev, ...newEntries]));
+      setHasMore(!pageData.last);
+
     } catch (error) {
       console.error("타임라인 데이터를 불러오는 데 실패했습니다:", error);
-      setEntries([]); // 오류 발생 시 목록 비우기
+      setEntries([]);
     } finally {
       setLoading(false);
     }
-  }, [loading]); // loading 상태가 바뀔 때만 함수를 재생성합니다.
+  }, []);
 
-  // 2. 탭(selectedSlotKey)이 변경될 때만 실행되는 useEffect
   useEffect(() => {
-    // 상태를 초기화하고 첫 페이지(0) 데이터를 즉시 불러옵니다.
     setEntries([]);
     setPage(0);
     setHasMore(true);
-    fetchTimeline(0, selectedSlotKey);
-  }, [selectedSlotKey]); // selectedSlotKey가 변경될 때만 실행됩니다.
+    fetchTimeline(0, selectedSlotKey, selectedTag);
+  }, [selectedSlotKey, selectedTag, fetchTimeline]);
 
-  // 3. 무한 스크롤을 위한 useEffect (페이지 번호 변경 시)
+  useEffect(() => {
+    if (page > 0) {
+      fetchTimeline(page, selectedSlotKey, selectedTag);
+    }
+  }, [page, fetchTimeline]);
+
   const observer = useRef<IntersectionObserver | null>(null);
   const lastEntryElementRef = useCallback(
     (node: HTMLElement | null) => {
       if (loading) return;
       if (observer.current) observer.current.disconnect();
-
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          // 페이지 번호를 증가시켜 다음 페이지를 로드합니다.
           setPage((prevPage) => prevPage + 1);
         }
       });
@@ -69,27 +80,38 @@ const TimelinePage: React.FC = () => {
     },
     [loading, hasMore]
   );
-  
-  // 4. 페이지 번호가 0보다 클 때(무한 스크롤 시) 추가 데이터를 로드하는 useEffect
-  useEffect(() => {
-    if (page > 0) {
-      fetchTimeline(page, selectedSlotKey);
-    }
-  }, [page]); // page가 변경될 때만 실행됩니다.
 
+  const handleTagClick = (tagName: string) => {
+    setSelectedTag(prev => prev === tagName ? null : tagName);
+  };
+  
   return (
     <div className={styles.timelineContainer}>
       <header className={styles.header}>
         <h1>공감 연대기</h1>
         <p>같은 시간을 지나온 익명의 기록들 속에서 잠시 쉬어가세요.</p>
       </header>
+      
+      {selectedTag && (
+        <div className={styles.filterHeader}>
+          <h2 className={styles.title}>
+            <span className={styles.tagHighlight}>#{selectedTag}</span>
+            <span> 감정 모아보기</span>
+          </h2>
+          {/* 👇 "전체 기록 보기" 버튼을 렌더링하는 부분을 삭제했습니다. */}
+        </div>
+      )}
 
       <div className={styles.tabs}>
         {Object.keys(TIME_SLOTS).map((key) => (
           <button
             key={key}
             className={`${styles.tab} ${selectedSlotKey === key ? styles.active : ""}`}
-            onClick={() => setSelectedSlotKey(key)}
+            // 태그가 선택된 상태에서 시간대 탭을 누르면 태그 필터링이 해제되도록 수정
+            onClick={() => {
+              setSelectedSlotKey(key);
+              setSelectedTag(null); 
+            }}
           >
             {key}
           </button>
@@ -98,14 +120,22 @@ const TimelinePage: React.FC = () => {
 
       <main className={styles.entryList}>
         {entries.map((entry, index) => {
+          const cardProps = {
+            key: entry.entryId,
+            entry: entry,
+            onTagClick: handleTagClick,
+            // 👇 현재 선택된 태그(selectedTag)를 props로 전달합니다.
+            selectedTag: selectedTag
+          };
+
           if (entries.length === index + 1) {
             return (
               <div ref={lastEntryElementRef} key={entry.entryId}>
-                <TimelineCard entry={entry} />
+                <TimelineCard {...cardProps} />
               </div>
             );
           }
-          return <TimelineCard key={entry.entryId} entry={entry} />;
+          return <TimelineCard {...cardProps} />;
         })}
       </main>
 
