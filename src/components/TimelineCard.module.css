@@ -1,0 +1,74 @@
+.card {
+  background-color: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(5px);
+  border: 1px solid #334155;
+  border-radius: 12px; /* 모서리를 조금 더 각지게 */
+  padding: 20px 25px; /* 내부 여백 축소 */
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  height: 200px; /* ✨ 높이 축소 (250px -> 220px) */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px); /* 호버 시 살짝 떠오르는 효과 */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.content {
+  flex-grow: 1;
+  font-size: 1rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-y: auto;
+  margin: 0;
+  /* 스크롤바 디자인 (수정) */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent; /* Firefox 용 */
+}
+
+.content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: transparent; /* 트랙 배경 투명 */
+}
+
+.content::-webkit-scrollbar-thumb {
+  background-color: transparent; /* 스크롤바 핸들 투명 */
+  border-radius: 6px;
+}
+
+.content:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(75, 85, 99, 0.5); /* 마우스 올렸을 때만 보이도록 */
+}
+
+.footer {
+  font-size: 0.85rem; /* ✨ 글자 크기 소폭 축소 */
+  color: #94a3b8;
+  border-top: 1px solid #334155;
+  padding-top: 12px; /* 내부 여백 축소 */
+  margin-top: 15px; /* 내부 여백 축소 */
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 15px 20px; /* 카드 내부 여백 축소 */
+    height: 200px; /* 카드 높이 소폭 축소 */
+    border-radius: 12px;
+  }
+
+  .content {
+    font-size: 0.9rem; /* 본문 글자 크기 축소 */
+    line-height: 1.5;
+  }
+
+  .footer {
+    font-size: 0.8rem; /* 푸터 글자 크기 축소 */
+    padding-top: 10px;
+    margin-top: 10px;
+  }
+}
