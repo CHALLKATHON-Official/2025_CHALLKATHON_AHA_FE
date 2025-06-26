@@ -12,14 +12,47 @@ const TIME_SLOTS = {
 };
 
 const TimelinePage: React.FC = () => {
-  const [selectedSlotKey, setSelectedSlotKey] = useState(
-    Object.keys(TIME_SLOTS)[0]
-  );
+  const [selectedSlotKey, setSelectedSlotKey] = useState(Object.keys(TIME_SLOTS)[0]);
   const [entries, setEntries] = useState<TimelineEntry[]>([]);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
+  // 1. 데이터 로딩 로직을 useCallback으로 분리하여 재사용 가능하고 안정적인 함수로 만듭니다.
+  const fetchTimeline = useCallback(async (pageNum: number, slotKey: string) => {
+    if (loading) return; // 중복 요청 방지
+    setLoading(true);
+    try {
+      const timeSlotsValues = TIME_SLOTS[slotKey as keyof typeof TIME_SLOTS];
+      const params = new URLSearchParams();
+      params.append('page', pageNum.toString());
+      params.append('size', '15');
+      timeSlotsValues.forEach(slot => params.append('timeSlots', slot));
+
+      const response = await api.get("/api/v1/timeline", { params });
+      const data = response.data.data;
+
+      // 페이지 번호가 0이면 새 데이터로 교체(탭 변경), 아니면 기존 데이터에 추가(무한 스크롤)
+      setEntries(prev => (pageNum === 0 ? data.content : [...prev, ...data.content]));
+      setHasMore(!data.last);
+    } catch (error) {
+      console.error("타임라인 데이터를 불러오는 데 실패했습니다:", error);
+      setEntries([]); // 오류 발생 시 목록 비우기
+    } finally {
+      setLoading(false);
+    }
+  }, [loading]); // loading 상태가 바뀔 때만 함수를 재생성합니다.
+
+  // 2. 탭(selectedSlotKey)이 변경될 때만 실행되는 useEffect
+  useEffect(() => {
+    // 상태를 초기화하고 첫 페이지(0) 데이터를 즉시 불러옵니다.
+    setEntries([]);
+    setPage(0);
+    setHasMore(true);
+    fetchTimeline(0, selectedSlotKey);
+  }, [selectedSlotKey]); // selectedSlotKey가 변경될 때만 실행됩니다.
+
+  // 3. 무한 스크롤을 위한 useEffect (페이지 번호 변경 시)
   const observer = useRef<IntersectionObserver | null>(null);
   const lastEntryElementRef = useCallback(
     (node: HTMLElement | null) => {
@@ -28,6 +61,7 @@ const TimelinePage: React.FC = () => {
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
+          // 페이지 번호를 증가시켜 다음 페이지를 로드합니다.
           setPage((prevPage) => prevPage + 1);
         }
       });
@@ -35,39 +69,13 @@ const TimelinePage: React.FC = () => {
     },
     [loading, hasMore]
   );
-
-  // 데이터 로딩 useEffect
+  
+  // 4. 페이지 번호가 0보다 클 때(무한 스크롤 시) 추가 데이터를 로드하는 useEffect
   useEffect(() => {
-    if (loading || !hasMore) return;
-
-    const fetchTimeline = async () => {
-      setLoading(true);
-      try {
-        const timeSlotParam =
-          TIME_SLOTS[selectedSlotKey as keyof typeof TIME_SLOTS][0];
-        const response = await api.get("/api/v1/timeline", {
-          params: { timeSlot: timeSlotParam, page, size: 15 },
-        });
-        const data = response.data.data;
-        setEntries((prev) =>
-          page === 0 ? data.content : [...prev, ...data.content]
-        );
-        setHasMore(!data.last);
-      } catch (error) {
-        console.error("타임라인 데이터를 불러오는 데 실패했습니다:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTimeline();
-  }, [page, selectedSlotKey]);
-
-  // 탭 변경 시 상태 리셋 useEffect
-  useEffect(() => {
-    setEntries([]);
-    setHasMore(true);
-    setPage(0);
-  }, [selectedSlotKey]);
+    if (page > 0) {
+      fetchTimeline(page, selectedSlotKey);
+    }
+  }, [page]); // page가 변경될 때만 실행됩니다.
 
   return (
     <div className={styles.timelineContainer}>
@@ -80,9 +88,7 @@ const TimelinePage: React.FC = () => {
         {Object.keys(TIME_SLOTS).map((key) => (
           <button
             key={key}
-            className={`${styles.tab} ${
-              selectedSlotKey === key ? styles.active : ""
-            }`}
+            className={`${styles.tab} ${selectedSlotKey === key ? styles.active : ""}`}
             onClick={() => setSelectedSlotKey(key)}
           >
             {key}

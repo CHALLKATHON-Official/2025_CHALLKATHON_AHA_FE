@@ -2,20 +2,21 @@ export interface PostData {
   postId: number;
   content: string;
   authorNickname: string;
-  authorProfileImageUrl: string;
+  authorProfileImageUrl: string | null; // URL이 없을 수 있으므로 null 허용
   echoCount: number;
   createdAt: string;
   isEchoed: boolean;
   tags: string[];
-  consentToArchive: boolean;
+  isAnonymous: boolean;
+  consentToArchive: boolean; // ✨ isAnonymous 필드 추가
 }
 
-// 회원가입 요청 타입
+// ... (이하 다른 타입 정의는 그대로 유지)
 export interface SignUpRequest {
-  loginId: string; // ✨ 아이디 필드 추가
+  loginId: string;
   email: string;
   password: string;
-  nickname: string; // '별명'에 해당합니다.
+  nickname: string;
 }
 
 export interface TimelineEntry {
