@@ -104,8 +104,8 @@ Gemini 1.5 Flash 모델 API를 통해 감정 키워드가 추출되며, 사용�
       → 게시글 + 선택한 감정 키워드 ID 리스트 + 익명 여부 전송
 
   1) @Query 기반 JOIN FETCH로 사용자 정보와 게시글을 한번에 로딩
-	2) 감정 태그는 DTO에서 별도로 추출 및 매핑
-	3) Page_SilentPost → Page_PostResponse 변환
+  2) 감정 태그는 DTO에서 별도로 추출 및 매핑
+  3) Page_SilentPost → Page_PostResponse 변환
   4) 감정 피드는 해당 시간대 기준으로 그룹화되어 반환  
 </pre>
 
