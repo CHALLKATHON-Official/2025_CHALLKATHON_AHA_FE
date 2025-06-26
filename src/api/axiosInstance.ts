@@ -2,9 +2,7 @@ import axios from "axios";
 import type { AxiosError } from "axios";
 
 const api = axios.create({
-  headers: {
-    "Content-Type": "application/json",
-  },
+  
 });
 
 api.interceptors.request.use(
