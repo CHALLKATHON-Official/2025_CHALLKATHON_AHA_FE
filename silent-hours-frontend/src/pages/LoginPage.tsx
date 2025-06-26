@@ -1,79 +1,75 @@
-import axios from 'axios';
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import api from '../api/axiosInstance';
+// src/pages/LoginPage.tsx
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './AuthForm.module.css';
 import { useAuth } from '../context/AuthContext';
+import type { LoginRequest } from '../types/auth'; // 로그인 요청 타입 임포트
 
 const LoginPage: React.FC = () => {
-  const { login, isLoggedIn } = useAuth();
-  const [loginId, setLoginId] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const navigate = useNavigate();
+  const [loginId, setLoginId] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const { login } = useAuth(); // AuthContext에서 login 함수 가져오기
+  const navigate = useNavigate(); // 라우팅을 위한 navigate 훅
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate('/');
-    }
-  }, [isLoggedIn, navigate]);
-  
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const requestData = { loginId, password };
+    setError(''); // 오류 메시지 초기화
+
+    if (!loginId || !password) {
+      setError('아이디와 비밀번호를 모두 입력해주세요.');
+      return;
+    }
 
     try {
-        const response = await api.post('/api/v1/auth/login', requestData);
-        const { accessToken, refreshToken } = response.data.data;
-        login(accessToken, refreshToken);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-          if (error.response && error.response.data) {
-              const errorMessage = error.response.data.data?.message || '로그인에 실패했습니다. 아이디 또는 비밀번호를 확인해주세요.';
-              alert(errorMessage);
-          } else {
-              alert('서버와 통신할 수 없습니다.');
-          }
-      } else {
-          alert('알 수 없는 오류가 발생했습니다.');
-          console.error("An unexpected error occurred:", error);
-      }
+      const credentials: LoginRequest = { loginId, password };
+      await login(credentials); // 로그인 함수 호출
+      navigate('/main'); // 로그인 성공 시 메인 페이지로 이동
+    } catch (err: any) {
+      // 서버에서 반환된 에러 메시지를 사용자에게 표시
+      const errorMessage = err.response?.data?.data?.message || '로그인에 실패했습니다. 아이디 또는 비밀번호를 확인해주세요.';
+      setError(errorMessage);
     }
-   };
+  };
+
+  const handleSignUpClick = () => {
+    navigate('/signup'); // 회원가입 페이지로 이동
+  };
 
   return (
     <div className={styles.authContainer}>
-      <h1 className={styles.title}>당신의 우주가 기다리고 있었습니다.</h1>
-      <p className={styles.subtitle}>어제의 감정은 오늘의 당신에게 어떤 별빛으로 빛나고 있을까요?</p>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <input
-          type="text"
-          value={loginId}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLoginId(e.target.value)}
-          placeholder="아이디"
-          required
-          className={styles.input}
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-          placeholder="비밀번호"
-          required
-          className={styles.input}
-        />
-        <button type="submit" className={styles.button}>로그인</button>
+      <form onSubmit={handleSubmit} className={styles.authForm}>
+        <h2>로그인</h2>
+        {error && <p className={styles.errorMessage}>{error}</p>}
+        <div className={styles.formGroup}>
+          <label htmlFor="loginId">아이디</label>
+          <input
+            type="text"
+            id="loginId"
+            value={loginId}
+            onChange={(e) => setLoginId(e.target.value)}
+            className={styles.inputField}
+            required
+          />
+        </div>
+        <div className={styles.formGroup}>
+          <label htmlFor="password">비밀번호</label>
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={styles.inputField}
+            required
+          />
+        </div>
+        <button type="submit" className={styles.submitButton}>로그인</button>
+        <button type="button" onClick={handleSignUpClick} className={styles.linkButton}>
+          계정이 없으신가요? 회원가입
+        </button>
       </form>
-      <div className={styles.linkContainer}>
-        <span>아직 회원이 아니신가요?</span>
-        <Link to="/signup" className={styles.link}>회원가입</Link>
-      </div>
-
-      {/* ✨ '메인으로 돌아가기'를 버튼 형태로 변경 */}
-      <Link to="/" className={styles.homeLinkButton}>
-        메인화면으로 돌아가기
-      </Link>
     </div>
   );
-}
+};
 
 export default LoginPage;

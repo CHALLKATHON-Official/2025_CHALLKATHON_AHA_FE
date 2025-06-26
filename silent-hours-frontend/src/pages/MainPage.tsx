@@ -1,3 +1,4 @@
+// src/pages/MainPage.tsx
 import React, { useState, useEffect } from 'react';
 import styles from './MainPage.module.css';
 import api from '../api/axiosInstance';
@@ -20,9 +21,12 @@ const MainPage: React.FC = () => {
             const response = await api.get('/api/v1/posts', {
                 params: { page: nextPage, size: 10, sort: 'createdAt,desc' }
             });
+            // 백엔드 응답에서 isAnonymous와 tags 필드를 매핑합니다.
             const newPosts: PostData[] = (response.data?.data?.content || []).map((post: any) => ({
                 ...post,
-                isEchoed: post.isEchoed || false 
+                isEchoed: post.isEchoed || false, 
+                isAnonymous: post.isAnonymous || false, 
+                tags: post.tags || [] 
             }));
 
             if (isRefresh) {
@@ -30,6 +34,7 @@ const MainPage: React.FC = () => {
             } else {
                 setPosts(prev => [...prev, ...newPosts]);
             }
+            // 새로운 게시물이 있다면 다음 페이지를 준비합니다.
             if (newPosts.length > 0) {
               setPage(nextPage + 1);
             }
@@ -42,9 +47,10 @@ const MainPage: React.FC = () => {
 
     useEffect(() => {
         const handleRefresh = () => fetchPosts(true);
+        // 'post-created' 이벤트 리스너를 추가하여 새 글 작성 시 피드를 새로고침합니다.
         window.addEventListener('post-created', handleRefresh);
-        fetchPosts(true); // 초기 로딩
-        return () => window.removeEventListener('post-created', handleRefresh);
+        fetchPosts(true); // 컴포넌트 마운트 시 초기 게시물 로딩
+        return () => window.removeEventListener('post-created', handleRefresh); // 클린업
     }, []);
 
     const handleToggleEcho = async (postId: number) => {
@@ -60,18 +66,17 @@ const MainPage: React.FC = () => {
             ));
         } catch (error) {
             console.error("Echo 처리 중 오류 발생:", error);
+            alert("메아리 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
         }
     };
 
     return (
-        // ✨ 새로운 feedContainer 클래스 적용
         <div className={styles.feedContainer}>
             <header className={styles.feedHeader}>
                 <h2>Anonymous messages</h2>
                 <p>For emotional messages</p>
             </header>
             
-            {/* ✨ postList 클래스를 그리드 레이아웃으로 변경 */}
             <main className={styles.postList}>
                 {posts.map((post) => (
                     <PostCard key={post.postId} post={post} onToggleEcho={handleToggleEcho} />
