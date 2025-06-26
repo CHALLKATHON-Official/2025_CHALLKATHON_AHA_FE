@@ -29,7 +29,6 @@ const MyChroniclePage: React.FC = () => {
 
   useEffect(() => {
     if (!isLoggedIn) return;
-    if (loading || !hasMore) return;
 
     const fetchMyPosts = async () => {
       setLoading(true);
@@ -72,6 +71,39 @@ const MyChroniclePage: React.FC = () => {
     }
   };
 
+  const handleConsentToggle = async (postId: number) => {
+    // 1단계: 함수가 올바른 ID로 호출되었는지 확인
+    console.log(`[1] ID [${postId}]의 동의 상태를 변경합니다.`);
+
+    try {
+      // 2단계: API를 호출하고, 전체 응답을 확인
+      const response = await api.patch(`/api/v1/posts/${postId}/consent`);
+      console.log("[2] 백엔드로부터 받은 전체 응답:", response);
+
+      // 3단계: 응답에서 새로운 동의 상태(true 또는 false)를 추출
+      const newConsentState = response.data.data;
+      console.log(`[3] 백엔드가 반환한 새로운 동의 상태: ${newConsentState}`);
+
+      // 4단계: 상태(state) 업데이트 전후를 비교
+      setPosts((currentPosts) => {
+        const postBeforeUpdate = currentPosts.find((p) => p.postId === postId);
+        console.log("[4] 상태 업데이트 전:", postBeforeUpdate);
+
+        const updatedPosts = currentPosts.map((p) =>
+          p.postId === postId ? { ...p, consentToArchive: newConsentState } : p
+        );
+
+        const postAfterUpdate = updatedPosts.find((p) => p.postId === postId);
+        console.log("[5] 상태 업데이트 후:", postAfterUpdate);
+
+        return updatedPosts;
+      });
+    } catch (error) {
+      console.error("아카이빙 동의 변경 처리 중 오류 발생:", error);
+      alert("처리 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -81,20 +113,24 @@ const MyChroniclePage: React.FC = () => {
 
       <main className={styles.postList}>
         {posts.map((post, index) => {
-          if (posts.length === index + 1) {
-            return (
-              <div ref={lastPostElementRef} key={post.postId}>
-                <PostCard post={post} onToggleEcho={handleToggleEcho} />
-              </div>
-            );
-          }
-          return (
+          const card = (
             <PostCard
               key={post.postId}
               post={post}
               onToggleEcho={handleToggleEcho}
+              onTagClick={() => {}}
+              onConsentToggle={handleConsentToggle}
             />
           );
+
+          if (posts.length === index + 1) {
+            return (
+              <div ref={lastPostElementRef} key={post.postId}>
+                {card}
+              </div>
+            );
+          }
+          return card;
         })}
       </main>
 

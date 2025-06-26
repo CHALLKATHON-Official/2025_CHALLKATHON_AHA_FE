@@ -1,5 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import type { ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -14,7 +21,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // ✨ 앱이 처음 로드될 때 localStorage에서 토큰 존재 여부로 초기 상태를 결정합니다.
   // 이 방식이 상태 동기화에 더 안정적입니다.
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
     return !!token;
   });
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -22,15 +29,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // ✨ useCallback을 사용하여 함수가 불필요하게 재생성되는 것을 방지합니다.
   const logout = useCallback(() => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
     setIsLoggedIn(false);
-    navigate('/');
+    navigate("/");
   }, [navigate]);
 
   const login = useCallback((accessToken: string, refreshToken: string) => {
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
     setIsLoggedIn(true);
   }, []);
 
@@ -44,14 +51,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const handleLogout = () => {
       logout();
-      alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+      alert("세션이 만료되었습니다. 다시 로그인해주세요.");
     };
 
-    window.addEventListener('logout', handleLogout);
+    window.addEventListener("logout", handleLogout);
 
     // 컴포넌트가 언마운트될 때 이벤트 리스너를 정리합니다.
     return () => {
-      window.removeEventListener('logout', handleLogout);
+      window.removeEventListener("logout", handleLogout);
     };
   }, [logout]);
 
@@ -65,7 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { AxiosRequestConfig, AxiosError } from "axios";
+import type { AxiosError } from "axios";
 
 const api = axios.create({
   headers: {

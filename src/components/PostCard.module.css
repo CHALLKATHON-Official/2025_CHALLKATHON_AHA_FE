@@ -1,118 +1,183 @@
 .postCard {
-    background-color: rgba(30, 41, 59, 0.7);
-    backdrop-filter: blur(5px);
-    border: 1px solid #334155;
-    border-radius: 16px;
-    padding: 25px 30px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    position: relative;
-    overflow: hidden;
-    color: #e2e8f0;
-    display: flex;
-    flex-direction: column;
+  background-color: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(5px);
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 25px 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
 }
 
 .postCard::after {
-    content: '';
-    position: absolute;
-    bottom: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 165, 0, 0.15) 0%, rgba(255, 165, 0, 0) 70%);
-    opacity: 0;
-    transition: opacity 0.5s;
-    z-index: 0;
+  content: "";
+  position: absolute;
+  bottom: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 165, 0, 0.15) 0%,
+    rgba(255, 165, 0, 0) 70%
+  );
+  opacity: 0;
+  transition: opacity 0.5s;
+  z-index: 0;
 }
 
 .postCard:hover::after {
-    opacity: 1;
+  opacity: 1;
 }
 
-.postHeader, .postContent, .postFooter {
-    position: relative;
-    z-index: 1;
+.postHeader,
+.postContent,
+.postFooter,
+.archiveConsentContainer {
+  position: relative;
+  z-index: 1;
 }
 
 .postHeader {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .profileImage {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    object-fit: cover;
-    background-color: #475569;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #475569;
 }
 
 .postAuthor {
-    font-weight: 500;
-    color: #cbd5e1;
+  font-weight: 500;
+  color: #cbd5e1;
 }
 
 .postContent {
-    flex-grow: 1;
-    font-size: 1rem;
-    line-height: 1.6;
-    margin: 20px 0;
-    white-space: pre-wrap;
+  flex-grow: 1;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 20px 0;
+  white-space: pre-wrap;
+}
+
+.archiveConsentContainer {
+  margin-bottom: 20px;
+  padding: 10px 15px;
+  background-color: rgba(15, 23, 42, 0.5);
+  border: 1px solid #334155;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toggleSwitch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.toggleSwitch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #475569;
+  transition: 0.4s;
+  border-radius: 28px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: #cbd5e1;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.toggleSwitch input:checked + .slider {
+  background-color: #0ea5e9;
+}
+
+.toggleSwitch input:checked + .slider:before {
+  transform: translateX(22px);
 }
 
 .postFooter {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    font-size: 0.9rem;
-    color: #94a3b8;
-    border-top: 1px solid #334155;
-    padding-top: 15px;
-    margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  font-size: 0.9rem;
+  color: #94a3b8;
+  border-top: 1px solid #334155;
+  padding-top: 15px;
+  margin-top: auto;
 }
 
 .tagsContainer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    flex-grow: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-grow: 1;
 }
 
 .tag {
-    background-color: #334155;
-    color: #cbd5e1;
-    padding: 4px 12px;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    cursor: pointer; /* 👇 마우스 커서 변경 */
-    transition: background-color 0.2s; /* 👇 부드러운 효과 추가 */
+  background-color: #334155;
+  color: #cbd5e1;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .tag:hover {
-    background-color: #475569; /* 👇 마우스 오버 시 배경색 변경 */
+  background-color: #475569;
 }
 
 .actionsContainer {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    color: #94a3b8;
-    font-size: 0.85rem;
-    flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  flex-shrink: 0;
 }
 .echoButton {
-    background: none;
-    border: none;
-    color: #94a3b8;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.9rem;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
 }
 
 .echoButton:hover {
-    color: #e2e8f0;
+  color: #e2e8f0;
 }

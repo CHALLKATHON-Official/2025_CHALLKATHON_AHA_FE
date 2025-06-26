@@ -6,7 +6,8 @@ export interface PostData {
   echoCount: number;
   createdAt: string;
   isEchoed: boolean;
-  tags: string[]
+  tags: string[];
+  consentToArchive: boolean;
 }
 
 // 회원가입 요청 타입

@@ -20,15 +20,18 @@ const MyPage: React.FC = () => {
         const profileData = response.data.data;
         setProfile(profileData);
         setNewNickname(profileData.nickname || "");
-        
+
         // ✨ 서버에서 받은 이미지 URL을 상태에 저장합니다.
         if (profileData.profileImageUrl) {
-            // ✨ 캐시 방지를 위해 타임스탬프를 쿼리 파라미터로 추가합니다.
-            setImageUrl(`http://localhost:8080${profileData.profileImageUrl}?t=${new Date().getTime()}`);
+          // ✨ 캐시 방지를 위해 타임스탬프를 쿼리 파라미터로 추가합니다.
+          setImageUrl(
+            `http://localhost:8080${
+              profileData.profileImageUrl
+            }?t=${new Date().getTime()}`
+          );
         } else {
-            setImageUrl("/default-profile.png");
+          setImageUrl("/default-profile.png");
         }
-
       } catch (error) {
         console.error("프로필 정보를 불러오는 데 실패했습니다:", error);
       } finally {
@@ -69,9 +72,11 @@ const MyPage: React.FC = () => {
           }
         );
         const newImageUrlPath = response.data.data;
-        
+        console.log("백엔드로부터 받은 새 경로: ", newImageUrlPath);
+
         // ✨ 새로운 이미지 URL로 상태를 업데이트하며 캐시를 무력화합니다.
         const newFullUrl = `http://localhost:8080${newImageUrlPath}?t=${new Date().getTime()}`;
+        console.log("state에 적용될 새로운 URL: ", newFullUrl);
         setImageUrl(newFullUrl);
 
         alert("프로필 이미지가 성공적으로 변경되었습니다.");
@@ -87,14 +92,22 @@ const MyPage: React.FC = () => {
   ) => {
     e.currentTarget.src = "/default-profile.png";
   };
-  
+
   // ... (로딩 및 프로필 없을 때의 UI는 그대로 유지)
   if (isLoading) {
-    return <div className={styles.container}><p>로딩 중...</p></div>;
+    return (
+      <div className={styles.container}>
+        <p>로딩 중...</p>
+      </div>
+    );
   }
 
   if (!profile) {
-    return <div className={styles.container}><p>프로필 정보를 불러올 수 없습니다.</p></div>;
+    return (
+      <div className={styles.container}>
+        <p>프로필 정보를 불러올 수 없습니다.</p>
+      </div>
+    );
   }
 
   return (
